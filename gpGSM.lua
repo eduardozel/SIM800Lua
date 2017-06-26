@@ -104,18 +104,20 @@ end -- strToHost
 
 function getRply(
 )
+	local CR = string.char( 0x0D)
+
 	local rd_len = 1
 	local timeout = 20000
     local rp = ""
 
 	local err, rply,  size = pHOST:read( rd_len, timeout )
     while not ( ( rply == "\n" ) or ( size == 0 )  ) do -- ( rply == "\n" ) or
+	if ( CR ~= rply ) then
 		rp = rp..rply
-		err, rply,  size = pHOST:read( rd_len, timeout )
+	end
+	err, rply,  size = pHOST:read( rd_len, timeout )
 	end -- while
---	err, rply,  size = pHOST:read( rd_len, timeout )
-	local r = string.sub( rp, 1, (string.len(rp)-1) )
-	return r
+	return rp
 end -- getRply
 
 -- Handle the button event
@@ -219,34 +221,24 @@ function OnOperators(event)
 end -- OnOperator(event)
 
 function OnSignal(event)
-	print ("read signal properties")
+	tbCONSOLE:AppendText("read signal properties\n")
 	openCOM_HOST()
 	sendCOM_HOST( "AT+CSQ\r")
 	local rp1 = getRply( )
---54
---2B
---43
---53
---51
---0D
---0D
---0A
 	print ("?"..rp1)
 	local rp2 = getRply()
-	print ("+"..rp2)
-	local rp3 = getRply()
-	print ("+"..rp3)
+	tbCONSOLE:AppendText(rp2.."\n")
 	closeCOM_HOST()
 end -- OnSignal(event)
 
 function OnRegistration(event)
-	print ("read registration")
+	tbCONSOLE:AppendText("read registration\n")
 	openCOM_HOST()
 	sendCOM_HOST( "AT+CREG?\r")
 	local rpl = getRply()
 	print ("?"..rpl)
 	local rpl = getRply()
-	print ("+"..rpl)
+	tbCONSOLE:AppendText(rpl.."\n")
 	closeCOM_HOST()
 end -- OnRegistration(event)
 
