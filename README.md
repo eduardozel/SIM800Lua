@@ -1,1 +1,5 @@
-# SIM800Lua
+
+LUA+wxWidget
+SIM800L
+
+discovering AT commands
