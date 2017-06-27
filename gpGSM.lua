@@ -255,12 +255,14 @@ function OnGetFunctionality(event)
 end -- OnGetFunctionality(event)
 
 function OnSetFunctionality(event)
-	print ("energia")
+	print ("functionality")
 	openCOM_HOST()
-	local emode = '0'
+	local emode = '0' -- minimum
 	local sl = rgEMode:GetSelection()
-	if ( 1 == sl) then 
+	if ( 1 == sl) then -- full
 		emode = '1' -- after set normal need check status
+	elseif ( 2 == sl) then -- flight mode
+		emode = '4' -- after set normal need check status
 	end
 	sendCOM_HOST( "AT+CFUN="..emode.."\r")
 	local rpl = getRply()
