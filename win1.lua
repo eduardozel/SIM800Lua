@@ -1,12 +1,13 @@
  require("gpGSM")
  require("SMSsend")
+ require("GPRS")
 
 
  local wx = require("wx")
 
 
     frame = wx.wxFrame( wx.NULL, wx.wxID_ANY, "Test gsm modem"
-                                 , wx.wxDefaultPosition, wx.wxSize( 500, 400)
+                                 , wx.wxDefaultPosition, wx.wxSize( 500, 470)
                                  , wx.wxDEFAULT_FRAME_STYLE)
 
     frame:Show(true)
@@ -17,5 +18,7 @@
 
     panelGpGSM()
     panelSMSsend()
+    panelGPRS()
+
 
 wx.wxGetApp():MainLoop()

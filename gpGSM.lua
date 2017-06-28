@@ -28,6 +28,9 @@ function panelGpGSM()
     ID_BUTTON_FUNC		= 1102
 	ID_RG_EMODE			= 1103
 
+	ID_PN_OTHERS		= 1200
+    ID_BUTTON_IMEI		= 1201
+	
 	btnSize = wx.wxSize( 80, 30)
 	chSize	= wx.wxSize(  6, 10)
 	
@@ -88,10 +91,14 @@ function panelGpGSM()
     frame:Connect( ID_BUTTON_FUNC, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnSetFunctionality)	
 	
 -- -----
+	pnOTHERS = wx.wxStaticBox(panelGP, ID_PN_OTHERS, "others", wx.wxPoint( 00, 300), wx.wxSize( 210, 60) )
+    btnIMEI = wx.wxButton( pnOTHERS, ID_BUTTON_IMEI, "IMEI", wx.wxPoint( 10, 15), btnSize )
+    frame:Connect( ID_BUTTON_IMEI, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnGetIMEI )	
+--
 
 	tbCONSOLE = wx.wxTextCtrl( panelGP, ID_TBOX_CONSOLE, "+", wx.wxPoint(220, 20), wx.wxSize(240, 280), wx.wxTE_MULTILINE ) -- +wx.wxNO_BORDER
 -- ---------	
-    notebook:AddPage(panelGP, "Test GSM Modem")
+    notebook:AddPage(panelGP, "general commands")
 
 end -- panelGpGSM
 
@@ -272,3 +279,21 @@ function OnSetFunctionality(event)
 	closeCOM_HOST()
 end -- OnSetFunctionality(event)
 -- --------
+
+function OnGetIMEI(event) -- 
+	tbCONSOLE:AppendText("GetIMEI\n")
+	openCOM_HOST()
+	sendCOM_HOST( "AT+GSN\r")
+	local rpl = getRply()
+	print ("?"..rpl)
+	local rpl = getRply()
+	tbCONSOLE:AppendText(rpl.."\n")
+	local rpl = getRply()
+	tbCONSOLE:AppendText(rpl.."\n")
+	local rpl = getRply()
+	tbCONSOLE:AppendText(rpl.."\n")
+	closeCOM_HOST()
+end -- OnRegistration(event)
+
+
+--
