@@ -31,7 +31,7 @@ function panelGpGSM()
 	ID_PN_OTHERS		= 1200
     ID_BUTTON_IMEI		= 1201
 	
-	btnSize = wx.wxSize( 80, 30)
+	local btnSize = wx.wxSize( 80, 30)
 	chSize	= wx.wxSize(  6, 10)
 	
 -- -----------
@@ -114,7 +114,7 @@ function getRply(
 	local CR = string.char( 0x0D)
 
 	local rd_len = 1
-	local timeout = 20000
+	local timeout = 40000
     local rp = ""
 
 	local err, rply,  size = pHOST:read( rd_len, timeout )
