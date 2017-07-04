@@ -1,6 +1,7 @@
  require("gpGSM")
- require("SMSsend")
+ require("SMS")
  require("GPRS")
+ require("phone")
 
 
  local wx = require("wx")
@@ -17,8 +18,9 @@
                                    --wx.wxNB_BOTTOM)
 
     panelGpGSM()
-    panelSMSsend()
+    panelSMS()
     panelGPRS()
+    panelPHONE()
 
 
 wx.wxGetApp():MainLoop()

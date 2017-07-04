@@ -11,9 +11,14 @@ function panelGpGSM()
     ID_BUTTON_Status	= 1011
 	ID_LBL_STOK			= 1012
 	
-    ID_BUTTON_Operator	= 1012
-    ID_BUTTON_Operators	= 1013
-    ID_BUTTON_Signal	= 1015
+	ID_PN_OPSOS			= 1100
+
+	ID_BUTTON_OpSIM		= 1101
+	ID_BUTTON_Operator	= 1112
+    ID_BUTTON_Operators	= 1113
+    
+
+	ID_BUTTON_Signal	= 1015
 
     ID_BUTTON_Reg		= 1020
     ID_BUTTON_CVal		= 1021
@@ -24,14 +29,14 @@ function panelGpGSM()
 
 	ID_LBL_PINOK		= 1006
 
-	ID_PN_FUNC			= 1101
-    ID_BUTTON_FUNC		= 1102
-	ID_RG_EMODE			= 1103
+	ID_PN_FUNC			= 1201
+    ID_BUTTON_FUNC		= 1202
+	ID_RG_EMODE			= 1203
 
-	ID_PN_OTHERS		= 1200
-    ID_BUTTON_IMEI		= 1201
+	ID_PN_OTHERS		= 1300
+    ID_BUTTON_IMEI		= 1301
 	
-	local btnSize = wx.wxSize( 80, 30)
+	btnSize = wx.wxSize( 60, 30)
 	chSize	= wx.wxSize(  6, 10)
 	
 -- -----------
@@ -63,21 +68,29 @@ function panelGpGSM()
 	
 -- ---------
 
-	btnOperator = wx.wxButton( panelGP, ID_BUTTON_Operator, "Operator",
-                          wx.wxPoint( 00, 140), wx.wxSize( 80,30) )
+	pnOPSOS  = wx.wxStaticBox(panelGP, ID_PN_OPSOS, "operator", wx.wxPoint( 00, 140), wx.wxSize( 210, 60) )
+
+	btnOpSIM =  wx.wxButton( pnOPSOS, ID_BUTTON_OpSIM, "SIM",
+                          wx.wxPoint( 10, 15), btnSize )
+    frame:Connect( ID_BUTTON_OpSIM, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnOpSIM)
+
+						  
+	btnOperator = wx.wxButton( pnOPSOS, ID_BUTTON_Operator, "current",
+                          wx.wxPoint( 70, 15), btnSize )
     frame:Connect( ID_BUTTON_Operator, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnOperator)	
 
-    btnOperators = wx.wxButton( panelGP, ID_BUTTON_Operators, "List operators",
-                          wx.wxPoint( 100, 140), wx.wxSize( 80,30) )
+    btnOperators = wx.wxButton( pnOPSOS, ID_BUTTON_Operators, "list",
+                          wx.wxPoint( 140, 15), btnSize )
     frame:Connect( ID_BUTTON_Operators, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnOperators)	
--- ------------	
+
+	-- ------------	
     btnSignal = wx.wxButton( panelGP, ID_BUTTON_Signal, "Signal",
-                          wx.wxPoint( 00, 170), wx.wxSize( 80,30) )
+                          wx.wxPoint( 00, 200), btnSize )
     frame:Connect( ID_BUTTON_Signal, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnSignal)	
 	
 -- -----
 
-	pnFUNC  = wx.wxStaticBox(panelGP, ID_PN_FUNC, "functionality", wx.wxPoint( 00, 200), wx.wxSize( 210, 100) )
+	pnFUNC  = wx.wxStaticBox(panelGP, ID_PN_FUNC, "functionality", wx.wxPoint( 00, 230), wx.wxSize( 210, 100) )
 
 	rgFUNC	= wx.wxRadioBox(pnFUNC, ID_RG_EMODE, "", wx.wxPoint( 10, 15), wx.wxSize(  180, 40),
                             {"minimal", "normal", "flight"}, 3, -- 0.796, 1.02, 0.892 mA
@@ -91,7 +104,7 @@ function panelGpGSM()
     frame:Connect( ID_BUTTON_FUNC, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnSetFunctionality)	
 	
 -- -----
-	pnOTHERS = wx.wxStaticBox(panelGP, ID_PN_OTHERS, "others", wx.wxPoint( 00, 300), wx.wxSize( 210, 60) )
+	pnOTHERS = wx.wxStaticBox(panelGP, ID_PN_OTHERS, "others", wx.wxPoint( 00, 330), wx.wxSize( 210, 50) )
     btnIMEI = wx.wxButton( pnOTHERS, ID_BUTTON_IMEI, "IMEI", wx.wxPoint( 10, 15), btnSize )
     frame:Connect( ID_BUTTON_IMEI, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnGetIMEI )	
 --
@@ -204,15 +217,26 @@ end -- OnTestPIN(event)
 
 -- ---------------------------
 
+function OnOpSIM(event)
+	tbCONSOLE:AppendText("SIM operator".."\n")
+	openCOM_HOST()
+	strToHost( "AT+CSPN?\r")
+	local rpl = getRply()
+	tbCONSOLE:AppendText(rpl.."\n")
+	local rpl = getRply()
+	tbCONSOLE:AppendText(rpl.."\n")
+	closeCOM_HOST()
+end -- OnOpSIM(event)
+
 
 function OnOperator(event)
-	print ("ask operator")
+	tbCONSOLE:AppendText("ask operator\n")
 	openCOM_HOST()
 	strToHost( "AT+COPS?\r")
 	local rpl = getRply()
-	print ("!"..rpl)
+	tbCONSOLE:AppendText(rpl.."\n")
 	local rpl = getRply()
-	print ("+"..rpl)
+	tbCONSOLE:AppendText(rpl.."\n")
 	closeCOM_HOST()
 end -- OnOperator(event)
 
