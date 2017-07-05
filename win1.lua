@@ -6,6 +6,7 @@
 
  local wx = require("wx")
 
+	OPSOS	=""
 
     frame = wx.wxFrame( wx.NULL, wx.wxID_ANY, "Test gsm modem"
                                  , wx.wxDefaultPosition, wx.wxSize( 500, 470)
