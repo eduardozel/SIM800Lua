@@ -44,7 +44,7 @@ function OnGPRS1(event)
 	print ("--  gprs")
 	protocol = ''
 	protocol = protocol..'AT+SAPBR=3,1, "CONTYPE", "GPRS"'
-	protocol = protocol..';+SAPBR=3,1, "APN", "internet.'..OPSOS..'.ru"'
+	protocol = protocol..';+SAPBR=3,1, "APN", "internet.'..OPSOS..'.ru"' -- access point name
 	protocol = protocol..';+SAPBR=3,1, "USER", "'..OPSOS..'"'
 	protocol = protocol..';+SAPBR=3,1, "PWD", "'..OPSOS..'"'
 	protocol = protocol..'\r'

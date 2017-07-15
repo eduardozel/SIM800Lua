@@ -2,6 +2,7 @@
  require("SMS")
  require("GPRS")
  require("phone")
+ require("book")
 
 
  local wx = require("wx")
@@ -22,6 +23,7 @@
     panelSMS()
     panelGPRS()
     panelPHONE()
+    panelBOOK()
 
 
 wx.wxGetApp():MainLoop()
