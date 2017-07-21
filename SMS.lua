@@ -7,7 +7,8 @@ function panelSMS()
     panelSMS = wx.wxPanel(notebook, wx.wxID_ANY)
     sizerBC = wx.wxBoxSizer(wx.wxVERTICAL)
 
-    ID_BUTTON_NoBrCast	= 2054
+    ID_PN_SMSSend		= 2001
+    ID_PN_SMSReceive	= 2002
 
     ID_BUTTON_FText		= 2034
 
@@ -19,20 +20,27 @@ function panelSMS()
     ID_BUTTON_SMS		= 2202
     ID_TBOX_MSG			= 2203
 
+	
+    ID_BUTTON_NoBrCast	= 2054
+	ID_BUTTON_TxtMode	= 2055
+	ID_BUTTON_SMSList	= 2056
+	ID_BUTTON_SMSRead	= 2057
+
 
 	cZ					= string.char( 0x1A)
 
-	
-
-    btnNoBrCast = wx.wxButton( panelSMS, ID_BUTTON_NoBrCast, "no broadcast",  wx.wxPoint( 10, 15), btnSize )
-    frame:Connect( ID_BUTTON_NoBrCast, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnBrCast)	
+-- -----
 	
 -- -----
-	pnNUM = wx.wxStaticBox(panelSMS, ID_PN_NUM, "number", wx.wxPoint( 10, 50), wx.wxSize( 220, 50) )	
+	pnSMSSend  = wx.wxStaticBox(panelSMS, ID_PN_SMSSend, "send", wx.wxPoint( 15, 15), wx.wxSize( 350, 180) )	
 
-	cbNUMBER = wx.wxComboBox( pnNUM, ID_CBOX_NUMBER, "chose phone", wx.wxPoint( 10, 15), wx.wxSize( 130, 20), {})--, wx.wxTE_PROCESS_ENTER )
+	pnNUM = wx.wxStaticBox(pnSMSSend, ID_PN_NUM, "number", wx.wxPoint( 10, 15), wx.wxSize( 250, 50) )	
 
-    btnNUM = wx.wxButton( pnNUM, ID_BUTTON_NUM, "set number",  wx.wxPoint( 150, 10), btnSize )
+    local fontNUMBER = wx.wxFont(12, wx.wxFONTFAMILY_MODERN, wx.wxFONTSTYLE_ITALIC, wx.wxFONTWEIGHT_NORMAL, false, "Andale Mono") -- wxFONTWEIGHT_NORMAL
+	cbNUMBER = wx.wxComboBox( pnNUM, ID_CBOX_NUMBER, "chose phone", wx.wxPoint( 10, 15), wx.wxSize( 150, 20), {})--, wx.wxTE_PROCESS_ENTER )
+	cbNUMBER:SetFont(fontNUMBER)
+
+    btnNUM = wx.wxButton( pnNUM, ID_BUTTON_NUM, "set number",  wx.wxPoint( 170, 15), btnSize )
     frame:Connect( ID_BUTTON_NUM, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnNumber)	
 	
 
@@ -45,22 +53,32 @@ function panelSMS()
 --	btnNUM:Disable( true)
 
 -- ----
-    btnFText = wx.wxButton( panelSMS, ID_BUTTON_FText, "text mode",  wx.wxPoint( 15, 110), btnSize )
+    btnFText = wx.wxButton( pnSMSSend, ID_BUTTON_FText, "text mode",  wx.wxPoint( 15, 75), btnSize )
     frame:Connect( ID_BUTTON_FText, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnFText)	
 
 -- ---
-	pnMSG = wx.wxStaticBox(panelSMS, ID_PN_MSG, "message", wx.wxPoint( 10, 180), wx.wxSize( 320, 50) )	
+	pnMSG = wx.wxStaticBox(pnSMSSend, ID_PN_MSG, "message", wx.wxPoint( 15, 115), wx.wxSize( 320, 50) )	
 
 	tbMSG = wx.wxTextCtrl( pnMSG, ID_TBOX_MSG, "enter mesage", wx.wxPoint(10, 15), wx.wxSize(200, 20), wx.wxTE_PROCESS_ENTER )
 
 	btnSMS = wx.wxButton( pnMSG, ID_BUTTON_SMS, "SMS", wx.wxPoint( 240, 15), btnSize )
-
-
-	
 	frame:Connect( ID_BUTTON_SMS, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnSMS)	
+-- -----
+	pnSMSReceive  = wx.wxStaticBox(panelSMS, ID_PN_SMSReceive, "receive", wx.wxPoint( 15, 200), wx.wxSize( 350, 180) )	
+
+    btnNoBrCast = wx.wxButton( pnSMSReceive, ID_BUTTON_NoBrCast, "no broadcast",  wx.wxPoint( 15, 15), wx.wxSize( 150, 30) )
+    frame:Connect( ID_BUTTON_NoBrCast, wx.wxEVT_COMMAND_BUTTON_CLICKED, SMSRead)	
 	
+    btnTextMode = wx.wxButton( pnSMSReceive, ID_BUTTON_TxtMode, "TextFormat",  wx.wxPoint( 170, 15), wx.wxSize( 80, 30) )
+    frame:Connect( ID_BUTTON_TxtMode, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnTextMode)	
+
+    btnSMSList = wx.wxButton( pnSMSReceive, ID_BUTTON_SMSList, "list",  wx.wxPoint( 15, 45), wx.wxSize( 80, 30) )
+    frame:Connect( ID_BUTTON_SMSList, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnSMSList)	
 	
-    notebook:AddPage(panelSMS, "Send SMS")
+    btnSMSRead = wx.wxButton( pnSMSReceive, ID_BUTTON_SMSRead, "get",  wx.wxPoint( 15, 80), wx.wxSize( 80, 30) )
+    frame:Connect( ID_BUTTON_SMSRead, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnSMSRead)	
+
+    notebook:AddPage(panelSMS, "SMS")
 
 end -- panelSMSsend
 
@@ -70,18 +88,6 @@ function OnNumberChoose(event
 )
 	btnNUM:Disable( false)
 end -- OnNumberChoose
-
-function OnBrCast(event)
-	print ("broadcast")
-	openCOM_HOST()
-	sendCOM_HOST( "AT+CSCB=1\r") -- not accepted.
-	local rpl = getRply()
-	print ("?"..rpl)
-	local rpl = getRply()
-	print ("?"..rpl)
-	closeCOM_HOST()
-end -- OnBrCast(event)
-
 
 function OnFText(event)
 
@@ -122,3 +128,60 @@ function OnSMS(event)
 	print ("?>"..rpl)
 	closeCOM_HOST()
 end -- OnSMS(event)
+-- -----------------
+function SMSRead(event)
+	print ("broadcast")
+	openCOM_HOST()
+	sendCOM_HOST( "AT+CSCB=1\r") -- not accepted.
+	local rpl = getRply()
+	print ("?"..rpl)
+	local rpl = getRply()
+	print ("?"..rpl)
+	closeCOM_HOST()
+end -- SMSRead(event)
+
+function OnTextMode(event)
+-- Max Response Time = -
+	print ("Text mode")
+	openCOM_HOST()
+	sendCOM_HOST( "AT+CMGF=1\r") -- 
+	local rpl = getRply()
+	print ("?"..rpl)
+	local rpl = getRply()
+	print ("?"..rpl)
+	closeCOM_HOST()
+end -- OnTextMode(event)
+
+function OnSMSList(event)
+-- Max Response Time = -
+	print ("OnSMSList")
+	openCOM_HOST()
+	sendCOM_HOST( 'AT+CMGL="REC UNREAD"\r') -- 
+	local rpl = getRply()
+	print ("?"..rpl)
+	local rpl = getRply()
+	print ("?"..rpl)
+	local rpl = getRply()
+	print ("?"..rpl)
+	closeCOM_HOST()
+end -- OnSMSList(event)
+
+function OnSMSRead(event)
+-- Max Response Time = -
+	print ("SMS get")
+	openCOM_HOST()
+	sendCOM_HOST( 'AT+CMGR=19\r') -- 
+	local rpl = getRply()
+	print ("?"..rpl)
+	local rpl = getRply()
+	print ("+"..rpl) -- OK
+	if ( rpl == "OK" ) then
+	print ("No such SMS")
+	else
+		local rpl = getRply()
+		print ("!"..rpl)
+	end
+	closeCOM_HOST()
+end -- OnSMSRead(event)
+
+
