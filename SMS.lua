@@ -25,7 +25,7 @@ function panelSMS()
 	ID_BUTTON_TxtMode	= 2055
 	ID_BUTTON_SMSList	= 2056
 	ID_BUTTON_SMSRead	= 2057
-
+	ID_SPIN_SMS			= 2058
 
 	cZ					= string.char( 0x1A)
 
@@ -72,10 +72,18 @@ function panelSMS()
     btnTextMode = wx.wxButton( pnSMSReceive, ID_BUTTON_TxtMode, "TextFormat",  wx.wxPoint( 170, 15), wx.wxSize( 80, 30) )
     frame:Connect( ID_BUTTON_TxtMode, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnTextMode)	
 
-    btnSMSList = wx.wxButton( pnSMSReceive, ID_BUTTON_SMSList, "list",  wx.wxPoint( 15, 45), wx.wxSize( 80, 30) )
+    SMSchoices = {"unread", "read", "unsent", "sent", "all"}
+    checkListBoxSMS = wx.wxCheckListBox(pnSMSReceive, wx.wxID_ANY, wx.wxPoint( 15, 45), wx.wxSize( 100, 80), SMSchoices, wx.wxLB_MULTIPLE)
+
+
+    btnSMSList = wx.wxButton( pnSMSReceive, ID_BUTTON_SMSList, "list",  wx.wxPoint( 120, 45), wx.wxSize( 80, 30) )
     frame:Connect( ID_BUTTON_SMSList, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnSMSList)	
 	
-    btnSMSRead = wx.wxButton( pnSMSReceive, ID_BUTTON_SMSRead, "get",  wx.wxPoint( 15, 80), wx.wxSize( 80, 30) )
+
+    spnSMSPos = wx.wxSpinCtrl( pnSMSReceive, ID_SPIN_SMS, "1", wx.wxPoint( 120, 80), wx.wxSize( 60, 30) )
+    spnSMSPos:SetToolTip("location number")
+
+    btnSMSRead = wx.wxButton( pnSMSReceive, ID_BUTTON_SMSRead, "get",  wx.wxPoint( 200, 80), wx.wxSize( 80, 30) )
     frame:Connect( ID_BUTTON_SMSRead, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnSMSRead)	
 
     notebook:AddPage(panelSMS, "SMS")
@@ -152,11 +160,12 @@ function OnTextMode(event)
 	closeCOM_HOST()
 end -- OnTextMode(event)
 
-function OnSMSList(event)
+
+function getSMSList( stat )
 -- Max Response Time = -
-	print ("OnSMSList")
+	print ("OnSMSList = "..stat)
 	openCOM_HOST()
-	sendCOM_HOST( 'AT+CMGL="REC UNREAD"\r') -- 
+	sendCOM_HOST( 'AT+CMGL="'..stat..'"\r') -- 
 	local rpl = getRply()
 	print ("?"..rpl)
 	local rpl = getRply()
@@ -164,13 +173,24 @@ function OnSMSList(event)
 	local rpl = getRply()
 	print ("?"..rpl)
 	closeCOM_HOST()
+end -- getSMSList
+
+function OnSMSList(event)
+	if ( checkListBoxSMS:IsChecked(0) ) then
+		getSMSList('REC UNREAD')
+	end
+	if ( checkListBoxSMS:IsChecked(1) ) then
+		getSMSList('REC READ')
+	end
 end -- OnSMSList(event)
 
 function OnSMSRead(event)
 -- Max Response Time = -
-	print ("SMS get")
+    local pos = spnSMSPos:GetValue()
+	print ("SMS get "..pos)
+
 	openCOM_HOST()
-	sendCOM_HOST( 'AT+CMGR=19\r') -- 
+	sendCOM_HOST( 'AT+CMGR='..pos..'\r') -- 
 	local rpl = getRply()
 	print ("?"..rpl)
 	local rpl = getRply()
