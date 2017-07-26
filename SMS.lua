@@ -25,7 +25,9 @@ function panelSMS()
 	ID_BUTTON_TxtMode	= 2055
 	ID_BUTTON_SMSList	= 2056
 	ID_BUTTON_SMSRead	= 2057
-	ID_SPIN_SMS			= 2058
+	ID_BUTTON_SMSDelete	= 2058
+
+	ID_SPIN_SMS			= 2060
 
 	cZ					= string.char( 0x1A)
 
@@ -73,19 +75,22 @@ function panelSMS()
     frame:Connect( ID_BUTTON_TxtMode, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnTextMode)	
 
     SMSchoices = {"unread", "read", "unsent", "sent", "all"}
-    checkListBoxSMS = wx.wxCheckListBox(pnSMSReceive, wx.wxID_ANY, wx.wxPoint( 15, 45), wx.wxSize( 100, 80), SMSchoices, wx.wxLB_MULTIPLE)
+    checkListBoxSMS = wx.wxCheckListBox(pnSMSReceive, wx.wxID_ANY, wx.wxPoint( 15, 50), wx.wxSize( 100, 80), SMSchoices, wx.wxLB_MULTIPLE)
 
 
-    btnSMSList = wx.wxButton( pnSMSReceive, ID_BUTTON_SMSList, "list",  wx.wxPoint( 120, 45), wx.wxSize( 80, 30) )
+    btnSMSList = wx.wxButton( pnSMSReceive, ID_BUTTON_SMSList, "list",  wx.wxPoint( 120, 50), wx.wxSize( 80, 30) )
     frame:Connect( ID_BUTTON_SMSList, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnSMSList)	
-	
 
-    spnSMSPos = wx.wxSpinCtrl( pnSMSReceive, ID_SPIN_SMS, "1", wx.wxPoint( 120, 80), wx.wxSize( 60, 30) )
+    spnSMSPos = wx.wxSpinCtrl( pnSMSReceive, ID_SPIN_SMS, "1", wx.wxPoint( 15, 135), wx.wxSize( 60, 30) )
     spnSMSPos:SetToolTip("location number")
 
-    btnSMSRead = wx.wxButton( pnSMSReceive, ID_BUTTON_SMSRead, "get",  wx.wxPoint( 200, 80), wx.wxSize( 80, 30) )
+    btnSMSRead = wx.wxButton( pnSMSReceive, ID_BUTTON_SMSRead, "get",  wx.wxPoint( 80, 135), wx.wxSize( 80, 30) )
     frame:Connect( ID_BUTTON_SMSRead, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnSMSRead)	
 
+    btnSMSDelete = wx.wxButton( pnSMSReceive, ID_BUTTON_SMSDelete, "delete",  wx.wxPoint( 175, 135), wx.wxSize( 80, 30) )
+    frame:Connect( ID_BUTTON_SMSDelete, wx.wxEVT_COMMAND_BUTTON_CLICKED, OnSMSDelete)	
+
+	
     notebook:AddPage(panelSMS, "SMS")
 
 end -- panelSMSsend
@@ -169,18 +174,32 @@ function getSMSList( stat )
 	local rpl = getRply()
 	print ("?"..rpl)
 	local rpl = getRply()
-	print ("?"..rpl)
-	local rpl = getRply()
-	print ("?"..rpl)
+	if ( rpl == "OK" ) then
+		print ("empty")
+	else
+		print ("?"..rpl)
+		local rpl = getRply()
+		print ("?"..rpl)
+	end
 	closeCOM_HOST()
 end -- getSMSList
 
 function OnSMSList(event)
-	if ( checkListBoxSMS:IsChecked(0) ) then
-		getSMSList('REC UNREAD')
-	end
-	if ( checkListBoxSMS:IsChecked(1) ) then
-		getSMSList('REC READ')
+	if ( checkListBoxSMS:IsChecked(4) ) then
+			getSMSList('ALL')
+	else
+		if ( checkListBoxSMS:IsChecked(0) ) then
+			getSMSList('REC UNREAD')
+		end
+		if ( checkListBoxSMS:IsChecked(1) ) then
+			getSMSList('REC READ')
+		end
+		if ( checkListBoxSMS:IsChecked(2) ) then
+			getSMSList('STO UNSENT')
+		end
+		if ( checkListBoxSMS:IsChecked(3) ) then
+			getSMSList('STO SENT')
+		end
 	end
 end -- OnSMSList(event)
 
@@ -196,12 +215,32 @@ function OnSMSRead(event)
 	local rpl = getRply()
 	print ("+"..rpl) -- OK
 	if ( rpl == "OK" ) then
-	print ("No such SMS")
+		print ("No such SMS")
 	else
 		local rpl = getRply()
 		print ("!"..rpl)
 	end
 	closeCOM_HOST()
 end -- OnSMSRead(event)
+
+function OnSMSDelete(event)
+-- Max Response Time = -
+    local pos = spnSMSPos:GetValue()
+	print ("SMS get "..pos)
+
+	openCOM_HOST()
+	sendCOM_HOST( 'AT+CMGD='..pos..',0\r') -- 
+	local rpl = getRply()
+	print ("?"..rpl)
+	local rpl = getRply()
+	print ("+"..rpl) -- OK
+	if ( rpl == "OK" ) then
+		print ("No such SMS")
+	else
+		local rpl = getRply()
+		print ("!"..rpl)
+	end
+	closeCOM_HOST()
+end -- OnSMSDelete(event)
 
 
